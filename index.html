@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles/output.css" />
+    <title>Building Redux</title>
+  </head>
+  <body>
+    <div
+      class="bg-gray-200 text-gray-800 p-4 rounded-md h-screen grid grid-cols-2 gap-4"
+    >
+      <div
+        class="col-span-2 p-4 rounded-md shadow-md bg-blue-200 flex flex-col items-center"
+      >
+        <h2 class="text-blue-800">Customer Dashboard</h2>
+        <ul id="purchasedBooks"></ul>
+        <ul id="booksInBasket"></ul>
+      </div>
+      <div
+        class="p-4 rounded-md shadow-md bg-green-200 flex flex-col items-center"
+      >
+        <h2 class="text-green-800">Customer Basket Items</h2>
+        <ul id="customerBasket"></ul>
+      </div>
+      <div
+        class="p-4 rounded-md shadow-md bg-purple-200 flex flex-col items-center"
+      >
+        <h2 class="text-purple-800">Supplier Stock</h2>
+        <ul id="bookStore"></ul>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="./index.js"></script>
+</html>
