@@ -1,5 +1,5 @@
 import { books } from "./api.js";
-import { StoreState, Store, Action, Reducer } from "./types/types.js";
+import { StoreState, Store, Action, Reducer, Book } from "./types/types.js";
 
 export const createStore = (reducer: Reducer, initialState: StoreState) => {
   const store: Store = {
@@ -49,57 +49,60 @@ export const removeBookFromBasketAction = (
 export const reducer: Reducer = (prevState, action) => {
   switch (action.type) {
     case "book/addBookToBasket": {
-      const existingBookIndex = prevState.bookList.findIndex(
-        (book) =>
-          book.title === action.payload.title &&
-          book.author === action.payload.author
-      );
+      if (action.payload.author && action.payload.title) {
+        const findBook = (arr: Book[]) =>
+          arr.find(
+            (book) =>
+              book.author === action.payload.author &&
+              book.title === action.payload.title
+          );
 
-      if (existingBookIndex !== -1) {
-        const existingBook = prevState.bookList[existingBookIndex];
+        const bookInList = findBook(prevState.bookList);
+        if (bookInList && bookInList.quantity > 0) {
+          const updatedBookList = prevState.bookList.map((book) => {
+            if (
+              book.author === action.payload.author &&
+              book.title === action.payload.title
+            ) {
+              return {
+                ...book,
+                quantity: book.quantity - 1,
+              };
+            }
+            return book;
+          });
 
-        if (existingBook.quantity < action.payload.quantity) {
-          console.error("Not enough books available");
-          return prevState;
+          const bookInBasket = findBook(prevState.booksInBasket);
+          let updatedBooksInBasket = [...prevState.booksInBasket];
+
+          if (!bookInBasket) {
+            updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
+          } else {
+            updatedBooksInBasket = updatedBooksInBasket.map((book) => {
+              if (
+                book.author === action.payload.author &&
+                book.title === action.payload.title
+              ) {
+                return {
+                  ...book,
+                  quantity: book.quantity + 1,
+                };
+              }
+              return book;
+            });
+          }
+
+          return {
+            ...prevState,
+            bookList: updatedBookList,
+            booksInBasket: updatedBooksInBasket,
+          };
         }
-
-        const updatedBook = {
-          ...existingBook,
-          quantity: existingBook.quantity - action.payload.quantity,
-        };
-
-        const updatedBookList = [...prevState.bookList];
-        updatedBookList[existingBookIndex] = updatedBook;
-
-        const existingBasketBookIndex = prevState.booksInBasket.findIndex(
-          (book) =>
-            book.title === action.payload.title &&
-            book.author === action.payload.author
-        );
-
-        let updatedBooksInBasket;
-        if (existingBasketBookIndex !== -1) {
-          // Book already in the basket, update its quantity
-          updatedBooksInBasket = [...prevState.booksInBasket];
-          updatedBooksInBasket[existingBasketBookIndex].quantity +=
-            action.payload.quantity;
-        } else {
-          // Book not in the basket, add it to the basket
-          updatedBooksInBasket = [
-            ...prevState.booksInBasket,
-            { ...action.payload, quantity: 1 }, // Setting initial quantity to 1
-          ];
-        }
-
-        return {
-          ...prevState,
-          bookList: updatedBookList,
-          booksInBasket: updatedBooksInBasket,
-        };
-      } else {
-        console.error("Book not found");
+        console.error("Book list has quantity of 0");
         return prevState;
       }
+      console.error("Need title and author to manipulate state");
+      return prevState;
     }
 
     case "book/removeBookFromBasket": {
