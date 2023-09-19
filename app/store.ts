@@ -47,16 +47,16 @@ export const removeBookFromBasketAction = (
 });
 
 export const reducer: Reducer = (prevState, action) => {
+  const findBook = (arr: Book[]) =>
+    arr.find(
+      (book) =>
+        book.author === action.payload.author &&
+        book.title === action.payload.title
+    );
   switch (action.type) {
     case "book/addBookToBasket": {
       if (action.payload.author && action.payload.title) {
-        const findBook = (arr: Book[]) =>
-          arr.find(
-            (book) =>
-              book.author === action.payload.author &&
-              book.title === action.payload.title
-          );
-
+        // updates supplier list
         const bookInList = findBook(prevState.bookList);
         if (bookInList && bookInList.quantity > 0) {
           const updatedBookList = prevState.bookList.map((book) => {
@@ -72,9 +72,9 @@ export const reducer: Reducer = (prevState, action) => {
             return book;
           });
 
+          // updates customer basket
           const bookInBasket = findBook(prevState.booksInBasket);
           let updatedBooksInBasket = [...prevState.booksInBasket];
-
           if (!bookInBasket) {
             updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
           } else {
@@ -106,52 +106,61 @@ export const reducer: Reducer = (prevState, action) => {
     }
 
     case "book/removeBookFromBasket": {
-      const existingBookIndex = prevState.bookList.findIndex(
-        (book) =>
-          book.title === action.payload.title &&
-          book.author === action.payload.author
-      );
+      if (action.payload.author && action.payload.title) {
+        // updates customer basket
+        const bookInBasket = findBook(prevState.booksInBasket);
 
-      const existingBasketBookIndex = prevState.booksInBasket.findIndex(
-        (book) =>
-          book.title === action.payload.title &&
-          book.author === action.payload.author
-      );
-
-      if (existingBookIndex !== -1 && existingBasketBookIndex !== -1) {
-        const existingBook = prevState.bookList[existingBookIndex];
-        const existingBasketBook =
-          prevState.booksInBasket[existingBasketBookIndex];
-
-        // Increase the quantity in the bookList
-        const updatedBook = {
-          ...existingBook,
-          quantity: existingBook.quantity + action.payload.quantity,
-        };
-
-        // Decrease the quantity in the booksInBasket, or remove it if quantity is zero
-        const updatedBooksInBasket = [...prevState.booksInBasket];
-        if (existingBasketBook.quantity <= action.payload.quantity) {
-          updatedBooksInBasket.splice(existingBasketBookIndex, 1);
-        } else {
-          updatedBooksInBasket[existingBasketBookIndex].quantity -=
-            action.payload.quantity;
+        if (!bookInBasket) {
+          console.error("Book not found in basket");
+          return prevState;
         }
 
-        // Update the bookList
-        const updatedBookList = [...prevState.bookList];
-        updatedBookList[existingBookIndex] = updatedBook;
+        let updatedBooksInBasket = [...prevState.booksInBasket];
+        if (bookInBasket.quantity === 1) {
+          updatedBooksInBasket = updatedBooksInBasket.filter(
+            (book) =>
+              book.author !== action.payload.author ||
+              book.title !== action.payload.title
+          );
+        } else {
+          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
+            if (
+              book.author === action.payload.author &&
+              book.title === action.payload.title
+            ) {
+              return {
+                ...book,
+                quantity: book.quantity - 1,
+              };
+            }
+            return book;
+          });
+        }
+
+        // updates supplier list
+        const updatedBookList = prevState.bookList.map((book) => {
+          if (
+            book.author === action.payload.author &&
+            book.title === action.payload.title
+          ) {
+            return {
+              ...book,
+              quantity: book.quantity + 1,
+            };
+          }
+          return book;
+        });
 
         return {
           ...prevState,
           bookList: updatedBookList,
           booksInBasket: updatedBooksInBasket,
         };
-      } else {
-        console.error("Book not found in basket or book list");
-        return prevState;
       }
+      console.error("Need author and title to identify book");
+      return prevState;
     }
+
     default:
       return prevState;
   }

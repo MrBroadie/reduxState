@@ -1,18 +1,18 @@
-import {
-  updateBooksInBasket,
-  updateDashboard,
-  updateSupplierStoreList,
-} from "./helpers.js";
 import { createStore, getInitialState, reducer } from "./store.js";
+import {
+  renderCustomerBasket,
+  renderCustomerDashboard,
+  renderSupplierStoreList,
+} from "./components.js";
 
 export const store = createStore(reducer, getInitialState());
 
-updateSupplierStoreList(store.getState().bookList);
+renderSupplierStoreList(store.getState().bookList);
 
 store.subscribe(() => {
   const state = store.getState();
   console.log("> State changed:", state);
-  updateSupplierStoreList(state.bookList);
-  updateBooksInBasket(state.booksInBasket);
-  updateDashboard(state.booksInBasket);
+  renderSupplierStoreList(state.bookList);
+  renderCustomerBasket(state.booksInBasket);
+  renderCustomerDashboard(state.booksInBasket);
 });
