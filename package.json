@@ -5,7 +5,8 @@
   "main": "./app/index.js",
   "scripts": {
     "start": "live-server",
-    "build": "tsc"
+    "build": "tsc",
+    "build:styles": "cd ./styles && npx tailwindcss -i styles.css -o build/output.css"
   },
   "author": "",
   "license": "ISC",
