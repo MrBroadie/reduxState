@@ -6,7 +6,7 @@
 
 # production
 /build
-/styles/build
+/styles/build/
 
 # misc
 .DS_Store
