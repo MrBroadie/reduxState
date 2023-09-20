@@ -1,5 +1,5 @@
 {
-  "name": "redux",
+  "name": "RedDucks",
   "version": "1.0.0",
   "description": "Introduction to state management using Redux",
   "main": "./app/index.js",
