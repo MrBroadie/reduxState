@@ -108,12 +108,13 @@ export type Action = {
 export const reducer: Reducer = (prevState, action) => {
   switch (action.type) {
     case "book/addBookToBasket": {
-
-    }
-    default:{
       return prevState;
     }
-}
+    default: {
+      return prevState;
+    }
+  }
+};
 ```
 
 ### types.ts
