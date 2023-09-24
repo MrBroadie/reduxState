@@ -34,9 +34,21 @@ export const renderHTMLElement = (
 
     basketButton.addEventListener("click", () => {
       actionType === "book/addBookToBasket"
-        ? store.dispatch(addBookToBasketAction(book.title, book.author, 1))
+        ? store.dispatch(
+            addBookToBasketAction({
+              id: book.id,
+              title: book.title,
+              author: book.author,
+              quantity: 1,
+            })
+          )
         : store.dispatch(
-            removeBookFromBasketAction(book.title, book.author, 1)
+            removeBookFromBasketAction({
+              id: book.id,
+              title: book.title,
+              author: book.author,
+              quantity: 1,
+            })
           );
     });
 

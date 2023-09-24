@@ -28,31 +28,29 @@ export const getInitialState = () => ({
   booksInBasket: [],
 });
 
-export const addBookToBasketAction = (
-  title: string,
-  author: string,
-  quantity: number
-): Action => ({
+export const addBookToBasketAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
   type: "book/addBookToBasket",
-  payload: { title, author, quantity },
+  payload: { id, title, author, quantity },
 });
 
-export const removeBookFromBasketAction = (
-  title: string,
-  author: string,
-  quantity: number
-): Action => ({
+export const removeBookFromBasketAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
   type: "book/removeBookFromBasket",
-  payload: { title, author, quantity },
+  payload: { id, title, author, quantity },
 });
 
 export const reducer: Reducer = (prevState, action) => {
   const findBook = (arr: Book[]) =>
-    arr.find(
-      (book) =>
-        book.author === action.payload.author &&
-        book.title === action.payload.title
-    );
+    arr.find((book) => book.id === action.payload.id);
   switch (action.type) {
     case "book/addBookToBasket": {
       if (action.payload.author && action.payload.title) {
@@ -60,10 +58,7 @@ export const reducer: Reducer = (prevState, action) => {
         const bookInList = findBook(prevState.bookList);
         if (bookInList && bookInList.quantity > 0) {
           const updatedBookList = prevState.bookList.map((book) => {
-            if (
-              book.author === action.payload.author &&
-              book.title === action.payload.title
-            ) {
+            if (book.id === action.payload.id) {
               return {
                 ...book,
                 quantity: book.quantity - 1,
@@ -79,10 +74,7 @@ export const reducer: Reducer = (prevState, action) => {
             updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
           } else {
             updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-              if (
-                book.author === action.payload.author &&
-                book.title === action.payload.title
-              ) {
+              if (book.id === action.payload.id) {
                 return {
                   ...book,
                   quantity: book.quantity + 1,
@@ -106,7 +98,7 @@ export const reducer: Reducer = (prevState, action) => {
     }
 
     case "book/removeBookFromBasket": {
-      if (action.payload.author && action.payload.title) {
+      if (action.payload.id) {
         // updates customer basket
         const bookInBasket = findBook(prevState.booksInBasket);
 
@@ -118,16 +110,11 @@ export const reducer: Reducer = (prevState, action) => {
         let updatedBooksInBasket = [...prevState.booksInBasket];
         if (bookInBasket.quantity === 1) {
           updatedBooksInBasket = updatedBooksInBasket.filter(
-            (book) =>
-              book.author !== action.payload.author ||
-              book.title !== action.payload.title
+            (book) => book.id !== action.payload.id
           );
         } else {
           updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-            if (
-              book.author === action.payload.author &&
-              book.title === action.payload.title
-            ) {
+            if (book.id === action.payload.id) {
               return {
                 ...book,
                 quantity: book.quantity - 1,
