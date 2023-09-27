@@ -1,5 +1,10 @@
 import { store } from "./index.js";
-import { addBookToBasketAction, removeBookFromBasketAction } from "./store.js";
+import {
+  addBookToBasketAction,
+  addBookToSupplierListAction,
+  removeBookFromBasketAction,
+  removeBookFromSupplierListAction,
+} from "./store.js";
 import { Book } from "./types/types.js";
 
 export const renderHTMLElement = (
@@ -33,23 +38,41 @@ export const renderHTMLElement = (
     }
 
     basketButton.addEventListener("click", () => {
-      actionType === "book/addBookToBasket"
-        ? store.dispatch(
-            addBookToBasketAction({
-              id: book.id,
-              title: book.title,
-              author: book.author,
-              quantity: 1,
-            })
-          )
-        : store.dispatch(
-            removeBookFromBasketAction({
-              id: book.id,
-              title: book.title,
-              author: book.author,
-              quantity: 1,
-            })
-          );
+      if (actionType === "book/addBookToBasket") {
+        store.dispatch(
+          addBookToBasketAction({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            quantity: 1,
+          })
+        );
+        store.dispatch(
+          removeBookFromSupplierListAction({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            quantity: 1,
+          })
+        );
+      } else {
+        store.dispatch(
+          removeBookFromBasketAction({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            quantity: 1,
+          })
+        );
+        store.dispatch(
+          addBookToSupplierListAction({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            quantity: 1,
+          })
+        );
+      }
     });
 
     bookItemElement.appendChild(bookDetailsDiv);
