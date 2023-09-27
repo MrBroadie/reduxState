@@ -37,7 +37,7 @@ export const createStore = (reducer: Reducer, initialState: StoreState) => {
 };
 ```
 
-### type.ts
+### type/index.ts
 
 ```ts
 export type Store = {
