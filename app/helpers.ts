@@ -1,11 +1,11 @@
-import { store } from "./index.js";
-import {
-  addBookToBasketAction,
-  addBookToSupplierListAction,
-  removeBookFromBasketAction,
-  removeBookFromSupplierListAction,
-} from "./store.js";
-import { Book } from "./types/index.js";
+// import { store } from "./index.js";
+// import {
+//   addBookToBasketAction,
+//   // addBookToSupplierListAction,
+//   // removeBookFromBasketAction,
+//   removeBookFromSupplierListAction,
+// } from "./store.js";
+// import { Book } from "./types/index.js";
 
 export const renderHTMLElement = (
   bookArray: Book[],
@@ -55,23 +55,23 @@ export const renderHTMLElement = (
             quantity: 1,
           })
         );
-      } else {
-        store.dispatch(
-          removeBookFromBasketAction({
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            quantity: 1,
-          })
-        );
-        store.dispatch(
-          addBookToSupplierListAction({
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            quantity: 1,
-          })
-        );
+        // } else {
+        //   store.dispatch(
+        //     removeBookFromBasketAction({
+        //       id: book.id,
+        //       title: book.title,
+        //       author: book.author,
+        //       quantity: 1,
+        //     })
+        //   );
+        //   store.dispatch(
+        //     addBookToSupplierListAction({
+        //       id: book.id,
+        //       title: book.title,
+        //       author: book.author,
+        //       quantity: 1,
+        //     })
+        //   );
       }
     });
 
