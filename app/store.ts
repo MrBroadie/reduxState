@@ -132,65 +132,6 @@ export const reducer: Reducer = (prevState, action) => {
       }
     }
 
-    case "supplierList/addBook": {
-      if (action.payload.id) {
-        const updatedBookList = prevState.bookList.map((book) => {
-          if (
-            book.author === action.payload.author &&
-            book.title === action.payload.title
-          ) {
-            return {
-              ...book,
-              quantity: book.quantity + 1,
-            };
-          }
-          return book;
-        });
-
-        return {
-          ...prevState,
-          bookList: updatedBookList,
-        };
-      }
-      console.error("Need author and title to identify book");
-      return prevState;
-    }
-
-    case "basket/removeBook": {
-      if (action.payload.id) {
-        const bookInBasket = findBook(prevState.booksInBasket);
-
-        if (!bookInBasket) {
-          console.error("Book not found in basket");
-          return prevState;
-        }
-
-        let updatedBooksInBasket = [...prevState.booksInBasket];
-        if (bookInBasket.quantity === 1) {
-          updatedBooksInBasket = updatedBooksInBasket.filter(
-            (book) => book.id !== action.payload.id
-          );
-        } else {
-          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-            if (book.id === action.payload.id) {
-              return {
-                ...book,
-                quantity: book.quantity - 1,
-              };
-            }
-            return book;
-          });
-        }
-
-        return {
-          ...prevState,
-          booksInBasket: updatedBooksInBasket,
-        };
-      }
-      console.error("Need title and author to manipulate state");
-      return prevState;
-    }
-
     default:
       return prevState;
   }

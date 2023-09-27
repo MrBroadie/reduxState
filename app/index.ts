@@ -1,7 +1,7 @@
 import { createStore, getInitialState, reducer } from "./store.js";
 import {
-  renderCustomerBasket,
-  renderCustomerDashboard,
+  // renderCustomerBasket,
+  // renderCustomerDashboard,
   renderSupplierStoreList,
 } from "./components.js";
 
@@ -13,6 +13,4 @@ store.subscribe(() => {
   const state = store.getState();
   console.log("> State changed:", state);
   renderSupplierStoreList(state.bookList);
-  renderCustomerBasket(state.booksInBasket);
-  renderCustomerDashboard(state.booksInBasket);
 });
