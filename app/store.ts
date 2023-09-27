@@ -1,5 +1,5 @@
 import { books } from "./api.js";
-import { StoreState, Store, Action, Reducer, Book } from "./types/types.js";
+import { StoreState, Store, Action, Reducer, Book } from "./types/index.js";
 
 export const createStore = (reducer: Reducer, initialState: StoreState) => {
   const store: Store = {
@@ -73,30 +73,6 @@ export const reducer: Reducer = (prevState, action) => {
     arr.find((book) => book.id === action.payload.id);
 
   switch (action.type) {
-    case "supplierList/addBook": {
-      if (action.payload.id) {
-        const updatedBookList = prevState.bookList.map((book) => {
-          if (
-            book.author === action.payload.author &&
-            book.title === action.payload.title
-          ) {
-            return {
-              ...book,
-              quantity: book.quantity + 1,
-            };
-          }
-          return book;
-        });
-
-        return {
-          ...prevState,
-          bookList: updatedBookList,
-        };
-      }
-      console.error("Need author and title to identify book");
-      return prevState;
-    }
-
     case "supplierList/removeBook": {
       if (action.payload.id) {
         const bookInList = findBook(prevState.bookList);
@@ -129,29 +105,55 @@ export const reducer: Reducer = (prevState, action) => {
       if (action.payload.id) {
         const bookInList = findBook(prevState.bookList);
         const bookInBasket = findBook(prevState.booksInBasket);
-        let updatedBooksInBasket = [...prevState.booksInBasket];
-        if (!bookInBasket && bookInList) {
-          updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
-        } else {
-          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-            if (book.id === action.payload.id) {
-              return {
-                ...book,
-                quantity: book.quantity + 1,
-              };
-            }
-            return book;
-          });
-        }
+        if (bookInList && bookInList.quantity > 0) {
+          let updatedBooksInBasket = [...prevState.booksInBasket];
+          if (!bookInBasket && bookInList) {
+            updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
+          } else {
+            updatedBooksInBasket = updatedBooksInBasket.map((book) => {
+              if (book.id === action.payload.id) {
+                return {
+                  ...book,
+                  quantity: book.quantity + 1,
+                };
+              }
+              return book;
+            });
+          }
 
-        return {
-          ...prevState,
-          booksInBasket: updatedBooksInBasket,
-        };
+          return {
+            ...prevState,
+            booksInBasket: updatedBooksInBasket,
+          };
+        }
       } else {
         console.error("Need title and author to manipulate state");
         return prevState;
       }
+    }
+
+    case "supplierList/addBook": {
+      if (action.payload.id) {
+        const updatedBookList = prevState.bookList.map((book) => {
+          if (
+            book.author === action.payload.author &&
+            book.title === action.payload.title
+          ) {
+            return {
+              ...book,
+              quantity: book.quantity + 1,
+            };
+          }
+          return book;
+        });
+
+        return {
+          ...prevState,
+          bookList: updatedBookList,
+        };
+      }
+      console.error("Need author and title to identify book");
+      return prevState;
     }
 
     case "basket/removeBook": {

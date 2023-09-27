@@ -61,10 +61,11 @@ export const getInitialState = () => ({
 });
 ```
 
-### types.ts
+### types/index.ts
 
 ```ts
 export type Book = {
+  id: number;
   title: string;
   author: string;
   quantity: number;
@@ -81,17 +82,28 @@ export type StoreState = {
 ### store.ts
 
 ```ts
-export const addBookToBasketAction = (
-  title: string,
-  author: string,
-  quantity: number
-): Action => ({
-  type: "book/addBookToBasket",
-  payload: { title, author, quantity },
+export const addBookToBasketAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
+  type: "basket/addBook",
+  payload: { id, title, author, quantity },
+});
+
+export const removeBookFromSupplierListAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
+  type: "supplierList/removeBook",
+  payload: { id, title, author, quantity },
 });
 ```
 
-### types.ts
+### types/index.ts
 
 ```ts
 export type Action = {
@@ -107,7 +119,10 @@ export type Action = {
 ```ts
 export const reducer: Reducer = (prevState, action) => {
   switch (action.type) {
-    case "book/addBookToBasket": {
+    case "basket/addBook": {
+      return prevState;
+    }
+    case "supplierList/removeBook": {
       return prevState;
     }
     default: {
@@ -117,7 +132,7 @@ export const reducer: Reducer = (prevState, action) => {
 };
 ```
 
-### types.ts
+### types/index.ts
 
 ```ts
 export type Reducer = (state: StoreState, action: Action) => StoreState;
@@ -159,75 +174,91 @@ npm run build
 npm run start
 ```
 
+-- optional branch --
+
+```bash
+git checkout build-one
+```
+
 ## Step 7 - fill in reducer functionality:
 
 ### store.ts
 
 ```ts
-const findBook = (arr: Book[]) =>
-  arr.find(
-    (book) =>
-      book.author === action.payload.author &&
-      book.title === action.payload.title
-  );
-switch (action.type) {
-  case "book/addBookToBasket": {
-    if (action.payload.author && action.payload.title) {
-      // updates supplier list
-      const bookInList = findBook(prevState.bookList);
-      if (bookInList && bookInList.quantity > 0) {
-        const updatedBookList = prevState.bookList.map((book) => {
-          if (
-            book.author === action.payload.author &&
-            book.title === action.payload.title
-          ) {
-            return {
-              ...book,
-              quantity: book.quantity - 1,
-            };
-          }
-          return book;
-        });
+ const findBook = (arr: Book[]) =>
+    arr.find((book) => book.id === action.payload.id);
 
-        // updates customer basket
-        const bookInBasket = findBook(prevState.booksInBasket);
-        let updatedBooksInBasket = [...prevState.booksInBasket];
-        if (!bookInBasket) {
-          updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
-        } else {
-          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-            if (
-              book.author === action.payload.author &&
-              book.title === action.payload.title
-            ) {
+  switch (action.type) {
+    case "supplierList/removeBook": {
+      if (action.payload.id) {
+        const bookInList = findBook(prevState.bookList);
+        if (bookInList && bookInList.quantity > 0) {
+          const updatedBookList = prevState.bookList.map((book) => {
+            if (book.id === action.payload.id) {
               return {
                 ...book,
-                quantity: book.quantity + 1,
+                quantity: book.quantity - 1,
               };
             }
             return book;
           });
-        }
 
-        return {
-          ...prevState,
-          bookList: updatedBookList,
-          booksInBasket: updatedBooksInBasket,
-        };
+          return {
+            ...prevState,
+            bookList: updatedBookList,
+          };
+        } else {
+          console.error("Book list has quantity of 0");
+          return prevState;
+        }
+      } else {
+        console.error("Need title and author to manipulate state");
+        return prevState;
       }
-      console.error("Book list has quantity of 0");
-      return prevState;
     }
-    console.error("Need title and author to manipulate state");
-    return prevState;
-  }
-}
+
+    case "basket/addBook": {
+      if (action.payload.id) {
+        const bookInList = findBook(prevState.bookList);
+        const bookInBasket = findBook(prevState.booksInBasket);
+        if (bookInList && bookInList.quantity > 0) {
+          let updatedBooksInBasket = [...prevState.booksInBasket];
+          if (!bookInBasket && bookInList) {
+            updatedBooksInBasket.push({ ...bookInList, quantity: 1 });
+          } else {
+            updatedBooksInBasket = updatedBooksInBasket.map((book) => {
+              if (book.id === action.payload.id) {
+                return {
+                  ...book,
+                  quantity: book.quantity + 1,
+                };
+              }
+              return book;
+            });
+          }
+
+          return {
+            ...prevState,
+            booksInBasket: updatedBooksInBasket,
+          };
+        }
+      } else {
+        console.error("Need title and author to manipulate state");
+        return prevState;
+      }
+    }
 ```
 
 — build —
 
 ```bash
 npm run build
+```
+
+-- optional branch --
+
+```bash
+git checkout build-two
 ```
 
 ## Step 8 - Add components to listen to booksInBasket:
@@ -255,50 +286,35 @@ export const renderCustomerDashboard = (booksInBasket: Book[]) =>
 ### index.ts
 
 ```ts
-renderCustomerBasket(state.booksInBasket);
-renderCustomerDashboard(state.booksInBasket);
+store.subscribe(() => {
+  const state = store.getState();
+  console.log("> State changed:", state);
+  renderSupplierStoreList(state.bookList);
+  // add these two lines
+  renderCustomerBasket(state.booksInBasket);
+  renderCustomerDashboard(state.booksInBasket);
+});
 ```
 
 — build —
+
+```bash
+npm run build
+```
+
+-- optional branch --
+
+```bash
+git checkout build-three
+```
 
 ## Step 9 - add remove book reducer:
 
 ### store.ts
 
 ```ts
-case "book/removeBookFromBasket": {
-if (action.payload.author && action.payload.title) {
-// updates customer basket
-const bookInBasket = findBook(prevState.booksInBasket);
-
-        if (!bookInBasket) {
-          console.error("Book not found in basket");
-          return prevState;
-        }
-
-        let updatedBooksInBasket = [...prevState.booksInBasket];
-        if (bookInBasket.quantity === 1) {
-          updatedBooksInBasket = updatedBooksInBasket.filter(
-            (book) =>
-              book.author !== action.payload.author ||
-              book.title !== action.payload.title
-          );
-        } else {
-          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
-            if (
-              book.author === action.payload.author &&
-              book.title === action.payload.title
-            ) {
-              return {
-                ...book,
-                quantity: book.quantity - 1,
-              };
-            }
-            return book;
-          });
-        }
-
-        // updates supplier list
+ case "supplierList/addBook": {
+      if (action.payload.id) {
         const updatedBookList = prevState.bookList.map((book) => {
           if (
             book.author === action.payload.author &&
@@ -315,12 +331,54 @@ const bookInBasket = findBook(prevState.booksInBasket);
         return {
           ...prevState,
           bookList: updatedBookList,
-          booksInBasket: updatedBooksInBasket,
         };
       }
       console.error("Need author and title to identify book");
       return prevState;
     }
+
+    case "basket/removeBook": {
+      if (action.payload.id) {
+        const bookInBasket = findBook(prevState.booksInBasket);
+
+        if (!bookInBasket) {
+          console.error("Book not found in basket");
+          return prevState;
+        }
+
+        let updatedBooksInBasket = [...prevState.booksInBasket];
+        if (bookInBasket.quantity === 1) {
+          updatedBooksInBasket = updatedBooksInBasket.filter(
+            (book) => book.id !== action.payload.id
+          );
+        } else {
+          updatedBooksInBasket = updatedBooksInBasket.map((book) => {
+            if (book.id === action.payload.id) {
+              return {
+                ...book,
+                quantity: book.quantity - 1,
+              };
+            }
+            return book;
+          });
+        }
+
+        return {
+          ...prevState,
+          booksInBasket: updatedBooksInBasket,
+        };
+      }
+      console.error("Need title and author to manipulate state");
+      return prevState;
+    }
 ```
 
-— build —
+```bash
+npm run build
+```
+
+-- optional branch --
+
+```bash
+git checkout completedCode
+```

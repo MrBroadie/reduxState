@@ -5,7 +5,7 @@ import {
   removeBookFromBasketAction,
   removeBookFromSupplierListAction,
 } from "./store.js";
-import { Book } from "./types/types.js";
+import { Book } from "./types/index.js";
 
 export const renderHTMLElement = (
   bookArray: Book[],
