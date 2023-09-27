@@ -48,26 +48,6 @@ export const removeBookFromSupplierListAction = ({
   payload: { id, title, author, quantity },
 });
 
-export const addBookToSupplierListAction = ({
-  id,
-  title,
-  author,
-  quantity,
-}: Book): Action => ({
-  type: "supplierList/addBook",
-  payload: { id, title, author, quantity },
-});
-
-export const removeBookFromBasketAction = ({
-  id,
-  title,
-  author,
-  quantity,
-}: Book): Action => ({
-  type: "basket/removeBook",
-  payload: { id, title, author, quantity },
-});
-
 export const reducer: Reducer = (prevState, action) => {
   const findBook = (arr: Book[]) =>
     arr.find((book) => book.id === action.payload.id);
