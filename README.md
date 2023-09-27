@@ -308,9 +308,31 @@ npm run build
 git checkout build-three
 ```
 
-## Step 9 - add remove book reducer:
+## Step 9 - add remove book action and reducer:
 
 ### store.ts
+
+```ts
+export const addBookToSupplierListAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
+  type: "supplierList/addBook",
+  payload: { id, title, author, quantity },
+});
+
+export const removeBookFromBasketAction = ({
+  id,
+  title,
+  author,
+  quantity,
+}: Book): Action => ({
+  type: "basket/removeBook",
+  payload: { id, title, author, quantity },
+});
+```
 
 ```ts
  case "supplierList/addBook": {
@@ -372,6 +394,10 @@ git checkout build-three
       return prevState;
     }
 ```
+
+### helpers.ts
+
+uncomment lines 58 - 74
 
 ```bash
 npm run build
