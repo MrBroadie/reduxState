@@ -177,7 +177,7 @@ npm run start
 -- optional branch --
 
 ```bash
-git checkout build-one
+git checkout origin/build-one
 ```
 
 ## Step 7 - fill in reducer functionality:
@@ -258,7 +258,7 @@ npm run build
 -- optional branch --
 
 ```bash
-git checkout build-two
+git checkout origin/build-two
 ```
 
 ## Step 8 - Add components to listen to booksInBasket:
@@ -305,7 +305,7 @@ npm run build
 -- optional branch --
 
 ```bash
-git checkout build-three
+git checkout origin/build-three
 ```
 
 ## Step 9 - add remove book action and reducer:
@@ -406,5 +406,5 @@ npm run build
 -- optional branch --
 
 ```bash
-git checkout completedCode
+git checkout origin/main
 ```
