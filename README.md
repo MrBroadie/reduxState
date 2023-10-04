@@ -6,7 +6,7 @@ In this guide, we will walk through the steps to set up a global state managemen
 
 ```bash
 npm i
-npm run build:css
+npm run build:styes
 ```
 
 ## Step 1 - Function to create store:
